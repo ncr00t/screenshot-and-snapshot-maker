@@ -1,7 +1,5 @@
 package com.company.screenshot.screenshot_maker;
 
-import com.github.sarxos.webcam.Webcam;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
