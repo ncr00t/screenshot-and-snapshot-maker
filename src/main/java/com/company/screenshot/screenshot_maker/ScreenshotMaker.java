@@ -7,27 +7,15 @@ import java.awt.image.BufferedImage;
 
 public class ScreenshotMaker {
 
-    public ScreenshotMaker() {
-
+    public static Dimension getScreenResolution(){
+        return Toolkit.getDefaultToolkit()
+                      .getScreenSize();
     }
 
     public BufferedImage makeScreenshotFromScreen() throws AWTException {
-        Rectangle screen = new Rectangle(Toolkit.getDefaultToolkit()
-                                                .getScreenSize());
+        Dimension screenResolution = getScreenResolution();
+        Rectangle screen = new Rectangle(screenResolution);
         BufferedImage imageFromDesktop = new Robot().createScreenCapture(screen);
         return imageFromDesktop;
-    }
-
-    public BufferedImage makeScreenshotFromWebCam()  {
-        Webcam webcam = Webcam.getDefault();
-        Dimension imageResolution = new Dimension(Toolkit.getDefaultToolkit()
-                                                         .getScreenSize());
-        webcam.setCustomViewSizes(imageResolution);
-        webcam.setViewSize(imageResolution);
-
-        webcam.open();
-        BufferedImage imageFromWebCam = webcam.getImage();
-        webcam.close();
-        return imageFromWebCam;
     }
 }
