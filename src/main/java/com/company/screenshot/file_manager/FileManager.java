@@ -2,6 +2,7 @@ package com.company.screenshot.file_manager;
 
 import com.company.screenshot.name_generator.ScreenshotNameGenerator;
 import com.company.screenshot.screenshot_maker.ScreenshotMaker;
+import com.company.screenshot.snapshot_webcam_maker.SnapshotWebcamMaker;
 
 import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileSystemView;
@@ -9,9 +10,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class FileManager {
     private FileSystemView fileSystemView;
@@ -20,29 +18,39 @@ public class FileManager {
         fileSystemView = FileSystemView.getFileSystemView();
     }
 
-    public  File getHomeDirectory(){
+    public File getHomeDirectory(){
         return fileSystemView.getHomeDirectory();
     }
 
-    public File getHomeDirectoryWithScreenshot(String screenshotNameWithExtension){
-        return new File(getHomeDirectory(), screenshotNameWithExtension);
+    public File getPathToDirectoryWithScreenshot(File pathToDirectory, String screenshotNameWithExtension){
+        return new File(pathToDirectory, screenshotNameWithExtension);
     }
 
-    public String saveScreenshotInHomeDirectory(ScreenshotMaker screenshotMaker, ScreenshotNameGenerator screenshotNameGenerator) throws AWTException, IOException {
+    public String saveScreenshotFromScreenInDirectory(File pathToDirectory,ScreenshotMaker screenshotMaker, ScreenshotNameGenerator screenshotNameGenerator) throws AWTException, IOException {
         BufferedImage screenshot = screenshotMaker.makeScreenshotFromScreen();
+        String pathToScreenshot = saveImageInDirectory(pathToDirectory, screenshot,
+                                                           screenshotNameGenerator);
+        return pathToScreenshot;
+    }
+
+    public String saveSnapshotFromWebcamInDirectory(File pathToDirectory, SnapshotWebcamMaker snapshotWebcamMaker, ScreenshotNameGenerator screenshotNameGenerator) throws IOException {
+        BufferedImage snapshotFromWebcam = snapshotWebcamMaker.makeSnapshotFromWebCam();
+        String pathToSnapshotFromWebcam = saveImageInDirectory(pathToDirectory, snapshotFromWebcam,
+                                                                screenshotNameGenerator);
+        return pathToSnapshotFromWebcam;
+    }
+
+    private String saveImageInDirectory(File pathToDirectory, BufferedImage image, ScreenshotNameGenerator screenshotNameGenerator) throws IOException {
         String screenshotNameWithExtension = screenshotNameGenerator.generateScreenshotNameWithDate();
 
-        File homeDirectory = getHomeDirectory();
-        File homeDirectoryWithScreenshot = getHomeDirectoryWithScreenshot(screenshotNameWithExtension);
+        File pathDirectoryWithScreenshot = getPathToDirectoryWithScreenshot(pathToDirectory, screenshotNameWithExtension);
 
-        ImageIO.write(screenshot, screenshotNameGenerator.getExtension(),
-                homeDirectoryWithScreenshot);
-        return homeDirectory + "/" + screenshotNameWithExtension;
+        ImageIO.write(image, screenshotNameGenerator.getExtension(),
+                                 pathDirectoryWithScreenshot);
+        return pathToDirectory + "\\" + screenshotNameWithExtension;
     }
 
-    public boolean isExistFileWithThisName(String scrrenshotNameWithExtension){
-        File homeDirectory = getHomeDirectory();
-        Path pathToScreenshot = Paths.get(homeDirectory + "/" + scrrenshotNameWithExtension);
-        return Files.exists(pathToScreenshot);
+    public void deleteFile(String pathToImage){
+        new File(pathToImage).delete();
     }
 }
